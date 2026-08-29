@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpx @langchain/langgraph-cli dev"
+    "dev": "npx @langchain/langgraph-cli dev"
   },
   "keywords": [
     "langchain",
@@ -35,6 +35,22 @@
   },
   "devDependencies": {
     "@langchain/langgraph-cli": "^1.1.17"
+  },
+  "overrides": {
+    "fast-xml-parser": ">=4.5.4",
+    "tar": ">=7.5.10",
+    "hono": ">=4.12.4",
+    "@hono/node-server": ">=1.19.10",
+    "express-rate-limit": ">=8.2.2",
+    "langsmith": ">=0.4.6",
+    "@tootallnate/once": ">=3.0.1",
+    "path-to-regexp": ">=8.4.0",
+    "ibm-cloud-sdk-core": ">=5.4.9",
+    "file-type": ">=21.3.1"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "sqlite3": true
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -29,9 +29,27 @@ cd ./lca-langchainV1-essentials/js
 2. Install the package and dependencies:
 
 ```bash
+npm install
+```
+
+<details>
+<summary>Using pnpm instead</summary>
+
+```bash
 corepack enable
 pnpm install
 ```
+</details>
+
+> **Note for npm users:** this repo ships a `.npmrc` with `legacy-peer-deps=true`.
+> `@langchain/community` declares `@browserbasehq/stagehand` as a non-optional peer
+> dependency, and stagehand peer-depends on `dotenv@^16` while this project uses
+> `dotenv@^17`. pnpm only warns about unmet peers, but npm fails with `ERESOLVE`.
+> Nothing here uses stagehand, so relaxing strict peer resolution is safe.
+>
+> `package.json` also has an `allowScripts` entry for `better-sqlite3` and
+> `sqlite3`. npm 11.16+ blocks install scripts by default, and those two need
+> theirs to compile their native bindings for the SQL notebooks.
 
 3. Create a `.env` file in the project root with your API keys:
 
@@ -80,7 +98,7 @@ This will open Jupyter in your browser. When opening any of the `.ipynb` files i
 
 ```bash
 #to run
-pnpm langgraphjs dev
+npm run dev
 ```
 For more information on the LangSmith Studio, see the [documentation](https://docs.langchain.com/oss/python/langchain/studio)
 
