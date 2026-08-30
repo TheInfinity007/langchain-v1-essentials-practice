@@ -93,6 +93,64 @@ jupyter lab
 
 This will open Jupyter in your browser. When opening any of the `.ipynb` files in this directory, make sure to select the **Deno** kernel from the kernel selector in the top-right corner of the notebook interface.
 
+### Choosing a model provider (Claude or Gemini)
+
+The lessons default to Claude. `L2_messages.ipynb` also supports Gemini through
+a `provider` switch in its first code cell:
+
+```ts
+// const provider = "anthropic"
+const provider = "gemini"
+
+let llmModel;
+if (provider === "gemini") {
+    llmModel = "google-vertexai:gemini-2.5-flash"
+} else {
+    llmModel = "anthropic:claude-sonnet-4-5-20250929"
+}
+```
+
+Every agent cell in that lesson reads `llmModel`, so flipping `provider` swaps
+the whole notebook over.
+
+To use Gemini you need Vertex AI access on a Google Cloud project. There is no
+API key — authentication uses Application Default Credentials:
+
+```bash
+gcloud auth application-default login
+```
+
+Then set the project in `.env`. This is required: the project ID is **not**
+inferred from ADC, and omitting it fails with `Unable to detect a Project Id`.
+
+```env
+GOOGLE_CLOUD_PROJECT=your_gcp_project_id_here
+```
+
+Verified working models are `gemini-2.5-flash` and `gemini-2.5-pro`. Note that
+Gemini 2.5 spends reasoning tokens by default, so cells are slower and use more
+output tokens than the visible reply suggests. Tool-calling behaviour also
+differs from Claude — Gemini sometimes answers directly instead of invoking a
+tool, so the message count in the tool-calling section may be lower than the
+lesson text describes.
+
+### Running a lesson as a plain script
+
+`L2_messages.js` is a script port of `L2_messages.ipynb`, for running a lesson
+end-to-end from the terminal instead of stepping through cells. It follows the
+same sequence, but reuses one `agent`/`result` pair rather than redeclaring them
+per cell, and ends by invoking the haiku tool directly.
+
+Either runtime works:
+
+```bash
+# Deno
+deno run -A L2_messages.js
+
+# or Node, via tsx
+npx tsx L2_messages.js
+```
+
 
 5. Setup LangSmith Studio
 
