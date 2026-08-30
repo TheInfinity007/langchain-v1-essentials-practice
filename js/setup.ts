@@ -60,6 +60,9 @@ globalThis.displayMessage = (message: BaseMessage) => {
  */
 globalThis.displayStream = async (stream: AsyncIterable<[BaseMessage, never]>) => {
     let content = "";
+    console.log(`\n┌${"─".repeat(60)}┐`);
+    console.log("Displaying Stream")
+    console.log(`└${"─".repeat(60)}┘`);
     for await (const [message] of stream) {
         content += message.content;
         await Deno.jupyter.broadcast("update_display_data", {
