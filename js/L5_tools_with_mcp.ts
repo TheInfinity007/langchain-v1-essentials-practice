@@ -1,4 +1,6 @@
 import { MultiServerMCPClient } from '@langchain/mcp-adapters'
+import { createAgent } from 'langchain';
+import { getLlmModel } from './Utility';
 
 
 // Connects to the mcp time server for timezone aware operations
@@ -17,3 +19,11 @@ const mcpClient = new MultiServerMCPClient({
 
 const mcpTools = await mcpClient.getTools();
 console.log(`Loaded ${mcpTools.length} MCP Tools:`, mcpTools.map((t) => t.name))
+
+
+let agent;
+agent = createAgent({
+    model: getLlmModel(),
+    tools: mcpTools,
+    systemPrompt: 'You are a helpful assistant'
+})
