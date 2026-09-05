@@ -1,9 +1,9 @@
-import * as setup from "./setup.ts";
-import { createAgent } from "langchain";
-import { } from "langchain/chat_models/universal"
+import "./setup.ts";
+import { createAgent, tool, type Runtime } from "langchain";
 import { HumanMessage } from "langchain";
+import z from "zod";
 
-const print = (msg) => console.log(`\n==>> ${msg}`);
+const print = (msg: string) => console.log(`\n==>> ${msg}`);
 
 const PROVIDER = {
     GEMINI: 'gemini',
@@ -28,11 +28,13 @@ const result = await agent.invoke({
     messages: [new HumanMessage("Tell me a joke")]
 })
 
+
+
 console.log(result.messages.at(-1)?.content)
 let stream;
 let counter;
 
-
+/*
 print("\n==>> Streams start with mode values:")
 stream = await agent.stream(
     {
@@ -49,9 +51,9 @@ for await(const step of stream) {
     console.log(`Counter: ${counter++}, Step.Message Size: ${step.messages.length}, Time: ${new Date().toISOString()}`)
     console.log(step.messages.at(-1).content)
 }
- // */
+// */
 
-
+/*
 print("\n==>> Streams start with mode 'messages':")
 
 stream = await agent.stream(
@@ -70,7 +72,7 @@ for await (const [message, metadata] of stream) {
 }
 
 // */
-// /*
+/*
 
 print("\n==>> Streams start with typewriter effect \n")
 stream = await agent.stream(
@@ -91,3 +93,25 @@ for await (const [message] of stream) {
 console.log();  // Add a final newline
 
 // */
+
+print("\n==>> Streams from the tool calls, delivering information to the user before the final result is ready \n")
+
+const getWeather = tool(
+    ({ city }, runtime: Runtime) => {
+        runtime.writer(`Looking up data for city ${city}`);
+        runtime.writer(`Acquired data for city ${city}`);
+        return `It's always cold and breezy in ${city}`
+    },
+    {
+        name: 'get_weather',
+        description: "Get weather for a given city",
+        schema: z.object({
+            city: z.string(),
+        })
+    }
+)
+
+const tollCallingAgent = createAgent({
+    model: llmModel,
+    tools: [getWeather]
+})
