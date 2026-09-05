@@ -1,6 +1,7 @@
 import './setup.ts'
 import { createAgent, tool } from "langchain";
 import z from "zod";
+import { print } from './Utility.ts';
 
 const PROVIDER = {
     GEMINI: 'gemini',
@@ -57,7 +58,13 @@ agent = createAgent({
     systemPrompt: "You are a helpfule assistant"
 })
 
-
-const result = agent.invoke({
-    messages: ["What is 3 - 2 ?"]
+print("Doing a substraction")
+const result = await agent.invoke({
+    messages: "What is 3 - 2 ?"
 })
+
+
+// displayMessage(result.messages?.at(-1))
+for (const message of result.messages) {
+    displayMessage(message)
+}
