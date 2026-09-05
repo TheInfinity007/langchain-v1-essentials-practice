@@ -25,7 +25,7 @@ interface DisplayableMessage {
 }
 
 declare global {
-    function displayMessage(message: DisplayableMessage): void;
+    function displayMessage(message: DisplayableMessage|string|undefined): void;
     function displayStream(stream: AsyncIterable<[DisplayableMessage, never]>, isConsole?: boolean): Promise<void>;
 }
 

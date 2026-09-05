@@ -59,7 +59,8 @@ agent = createAgent({
 })
 
 print("Doing a substraction")
-const result = await agent.invoke({
+let result;
+result = await agent.invoke({
     messages: "What is 3 - 2 ?"
 })
 
@@ -68,3 +69,11 @@ const result = await agent.invoke({
 for (const message of result.messages) {
     displayMessage(message)
 }
+
+print("Let's do a multiplication")
+result = await agent.invoke({
+    messages: "What is 3 * 4 ?"
+})
+
+displayMessage(result?.messages?.at(-1));
+
