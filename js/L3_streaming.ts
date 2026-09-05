@@ -2,8 +2,7 @@ import "./setup.ts";
 import { createAgent, tool, type Runtime } from "langchain";
 import { HumanMessage } from "langchain";
 import z from "zod";
-
-const print = (msg: string) => console.log(`\n==>> ${msg}`);
+import { print } from "./Utility.ts";
 
 const PROVIDER = {
     GEMINI: 'gemini',

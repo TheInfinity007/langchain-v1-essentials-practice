@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true
   }
 }
