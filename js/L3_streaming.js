@@ -32,6 +32,7 @@ console.log(result.messages.at(-1)?.content)
 let stream;
 let counter;
 
+
 print("\n==>> Streams start with mode values:")
 stream = await agent.stream(
     {
@@ -48,6 +49,8 @@ for await(const step of stream) {
     console.log(`Counter: ${counter++}, Step.Message Size: ${step.messages.length}, Time: ${new Date().toISOString()}`)
     console.log(step.messages.at(-1).content)
 }
+ // */
+
 
 print("\n==>> Streams start with mode 'messages':")
 
@@ -66,3 +69,25 @@ for await (const [message, metadata] of stream) {
     console.log(`${counter++} [${metadata.langgraph_node}]: ${message.content}`)
 }
 
+// */
+// /*
+
+print("\n==>> Streams start with typewriter effect \n")
+stream = await agent.stream(
+    {
+        messages: [new HumanMessage("Write me a poem.")]
+    },
+    {
+        streamMode: "messages"
+    }
+)
+
+for await (const [message] of stream) {
+    if(message.content) {
+        process.stdout.write(message.content);
+    }
+}
+
+console.log();  // Add a final newline
+
+// */
