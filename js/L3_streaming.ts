@@ -98,8 +98,8 @@ print("\n==>> Streams from the tool calls, delivering information to the user be
 
 const getWeather = tool(
     ({ city }, runtime: Runtime) => {
-        runtime.writer(`Looking up data for city ${city}`);
-        runtime.writer(`Acquired data for city ${city}`);
+        runtime.writer?.(`Looking up data for city ${city}`);
+        runtime.writer?.(`Acquired data for city ${city}`);
         return `It's always cold and breezy in ${city}`
     },
     {
@@ -111,7 +111,25 @@ const getWeather = tool(
     }
 )
 
-const tollCallingAgent = createAgent({
+const toolCallingAgent = createAgent({
     model: llmModel,
     tools: [getWeather]
 })
+
+stream = await toolCallingAgent.stream(
+    {
+        messages: [new HumanMessage("What is the weather in Chandigarh, India")]
+    },
+    {
+        streamMode: ["values", "custom"]
+    }
+)
+
+for await (const [type, stateOrCustomEvent] of stream) {
+    if (type === "values") {
+        const latestMessage = stateOrCustomEvent.messages.at(-1);
+        displayMessage(latestMessage)
+    } else if (type === "custom") {
+        displayMessage({ type, content: stateOrCustomEvent })
+    }
+}

@@ -35,7 +35,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@langchain/langgraph-cli": "^1.1.17"
+    "@langchain/langgraph-cli": "^1.1.17",
+    "@types/node": "^26.4.1"
   },
   "overrides": {
     "fast-xml-parser": ">=4.5.4",
