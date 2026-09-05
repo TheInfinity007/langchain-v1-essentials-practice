@@ -34,7 +34,7 @@ console.log(result.messages.at(-1)?.content)
 let stream;
 let counter;
 
-/*
+
 print("\n==>> Streams start with mode values:")
 stream = await agent.stream(
     {
@@ -53,7 +53,7 @@ for await(const step of stream) {
 }
 // */
 
-/*
+
 print("\n==>> Streams start with mode 'messages':")
 
 stream = await agent.stream(
@@ -72,7 +72,7 @@ for await (const [message, metadata] of stream) {
 }
 
 // */
-/*
+
 
 print("\n==>> Streams start with typewriter effect \n")
 stream = await agent.stream(
