@@ -1,0 +1,68 @@
+import * as setup from "./setup.ts";
+import { createAgent } from "langchain";
+import { } from "langchain/chat_models/universal"
+import { HumanMessage } from "langchain";
+
+const print = (msg) => console.log(`\n==>> ${msg}`);
+
+const PROVIDER = {
+    GEMINI: 'gemini',
+    ANTHROPIC: 'anthropic'
+}
+
+const provider = PROVIDER.GEMINI;
+
+let llmModel;
+if (provider === PROVIDER.GEMINI) {
+    llmModel = "google-vertexai:gemini-2.5-flash"
+} else {
+    llmModel = "anthropic:claude-sonnet-4-5-20250929"
+}
+
+const agent = createAgent({
+    model: llmModel,
+    systemPrompt: "You are a full-stack comedian",
+})
+
+const result = await agent.invoke({
+    messages: [new HumanMessage("Tell me a joke")]
+})
+
+console.log(result.messages.at(-1)?.content)
+let stream;
+let counter;
+
+print("\n==>> Streams start with mode values:")
+stream = await agent.stream(
+    {
+        messages: [new HumanMessage("Tell me a joke")]
+    },
+    {
+        streamMode: "values"
+    }
+)
+
+
+counter = 1;
+for await(const step of stream) {
+    console.log(`Counter: ${counter++}, Step.Message Size: ${step.messages.length}, Time: ${new Date().toISOString()}`)
+    console.log(step.messages.at(-1).content)
+}
+
+print("\n==>> Streams start with mode 'messages':")
+
+stream = await agent.stream(
+    {
+        messages: [new HumanMessage("Tell me a joke")]
+    },
+    {
+        streamMode: "messages"
+    }
+)
+
+
+counter = 1;
+for await (const [message, metadata] of stream) {
+    console.log(`${counter++} [${metadata.langgraph_node}]: ${message.content}`)
+}
+
