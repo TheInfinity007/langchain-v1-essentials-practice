@@ -1,6 +1,7 @@
+import './setup';
 import { MultiServerMCPClient } from '@langchain/mcp-adapters'
 import { createAgent } from 'langchain';
-import { getLlmModel } from './Utility';
+import { getLlmModel, print } from './Utility';
 
 
 // Connects to the mcp time server for timezone aware operations
@@ -23,7 +24,18 @@ console.log(`Loaded ${mcpTools.length} MCP Tools:`, mcpTools.map((t) => t.name))
 
 let agent;
 agent = createAgent({
-    model: getLlmModel(),
+    model: getLlmModel("gemini"),
     tools: mcpTools,
     systemPrompt: 'You are a helpful assistant'
 })
+
+print("Asking about the current time in Dubai")
+const result = await agent.invoke({
+    messages: "What is the current time in Dubai right now ?"
+});
+
+for (const message of result.messages) {
+    displayMessage(message);
+}
+
+process.exit(0);
