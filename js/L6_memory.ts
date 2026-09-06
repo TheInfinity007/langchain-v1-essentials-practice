@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm'
 import z from 'zod'
 import './setup';   // Loads the env variables
 import { getLlmModel, print } from './Utility';
+import { MemorySaver } from '@langchain/langgraph';
 
 // Connect to the sqlite database containing music data
 const datasource: DataSource = new DataSource({
@@ -53,7 +54,7 @@ Rules:
 `
 
 // Create a agent with our tools and system prompt. No Checkpointer yet, so the agent won't remember previous conversations.
-const agent = createAgent({
+let agent = createAgent({
     model: getLlmModel("gemini"),
     tools: [executeSQL],
     systemPrompt: SYSTEM,
@@ -78,12 +79,60 @@ for await (const step of stream) {
     displayMessage(step.messages.at(-1));
 }
 
+// Follow up question without memory. What were the titles? Without memory the agent has no idea what we are referring to. Two things can happen, 1. Ask for clarification or 2. Hit and trial if it can find something related
 print("Follow up question without memory. What were the titles? Without memory the agent has no idea what we are referring to. Two things can happen, 1. Ask for clarification or 2. Hit and trial if it can find something related")
 stream = await agent.stream(
     { messages: "What were the titles?" },
     {
         streamMode: "values",
         context: { db }
+    }
+)
+
+counter = 1;
+for await (const step of stream) {
+    console.log(`${counter++} Total messages in the step: ${step.messages.length}`)
+    displayMessage(step.messages.at(-1));
+}
+
+// Let's fix this by adding a checkpointer. The MemorySaver will store conversation history so the agent can remember context across turns.
+
+print("Asking the same question again but this time with the thread id to track the conversation.")
+const checkpointer = new MemorySaver();
+agent = createAgent({
+    model: getLlmModel("gemini"),
+    tools: [executeSQL],
+    systemPrompt: SYSTEM,
+    contextSchema,
+    checkpointer
+})
+
+stream = await agent.stream(
+    { messages: "This is Frank Harris, What was the total on my last invoice?" },
+    {
+        streamMode: "values",
+        context: { db },
+        configurable: {
+            thread_id: "t_1"
+        }
+    }
+)
+
+counter = 1;
+for await (const step of stream) {
+    console.log(`${counter++} Total messages in the step: ${step.messages.length}`)
+    displayMessage(step.messages.at(-1));
+}
+
+print("Follow up question with memory this time");
+stream = await agent.stream(
+    { messages: "What were the titles?" },
+    {
+        streamMode: "values",
+        context: { db },
+        configurable: {
+            thread_id: "t_1"
+        }
     }
 )
 
