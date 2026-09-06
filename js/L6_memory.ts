@@ -3,7 +3,7 @@ import { createAgent, tool, type ToolRuntime } from 'langchain'
 import { DataSource } from 'typeorm'
 import z from 'zod'
 import './setup';   // Loads the env variables
-import { getLlmModel } from './Utility';
+import { getLlmModel, print } from './Utility';
 
 // Connect to the sqlite database containing music data
 const datasource: DataSource = new DataSource({
@@ -58,4 +58,22 @@ const agent = createAgent({
     tools: [executeSQL],
     systemPrompt: SYSTEM,
     contextSchema,
-})
+});
+
+print("Running agent without memory capabilities")
+
+let stream;
+stream = await agent.stream(
+    { messages: "This is Frank Harris, What was the total on my last invoice?" },
+    {
+        streamMode: "values",
+        context: { db }
+    }
+)
+
+let counter;
+counter = 1;
+for await (const step of stream) {
+    console.log(`${counter++} Total messages in the step: ${step.messages.length}`)
+    displayMessage(step.messages.at(-1));
+}
