@@ -1,8 +1,9 @@
 import { SqlDatabase } from '@langchain/classic/sql_db'
-import { type Runtime, tool } from 'langchain'
+import { createAgent, tool, type ToolRuntime } from 'langchain'
 import { DataSource } from 'typeorm'
 import z from 'zod'
-
+import './setup';   // Loads the env variables
+import { getLlmModel } from './Utility';
 
 // Connect to the sqlite database containing music data
 const datasource: DataSource = new DataSource({
@@ -25,7 +26,7 @@ type Context = z.infer<typeof contextSchema>;
 
 // Create a tool to execute a SQL queries. It supports named parameters (:first, :last) that gets replaced with values from the runtime context.
 const executeSQL = tool(
-    async ({ query }, runtime: Runtime<Context>) => {   // Getting warning
+    async ({ query }, runtime: ToolRuntime<unknown, Context>) => {   // Getting warning
         return await runtime.context.db.run(query);
     },
     {
@@ -50,3 +51,11 @@ Rules:
 - If the tool returns "Error:", revise the SQL and try again.
 - Prefer explicit column lists, avoid SELECT *.
 `
+
+// Create a agent with our tools and system prompt. No Checkpointer yet, so the agent won't remember previous conversations.
+const agent = createAgent({
+    model: getLlmModel("gemini"),
+    tools: [executeSQL],
+    systemPrompt: SYSTEM,
+    contextSchema,
+})
