@@ -77,3 +77,18 @@ for await (const step of stream) {
     console.log(`${counter++} Total messages in the step: ${step.messages.length}`)
     displayMessage(step.messages.at(-1));
 }
+
+print("Follow up question without memory. What were the titles? Without memory the agent has no idea what we are referring to. Two things can happen, 1. Ask for clarification or 2. Hit and trial if it can find something related")
+stream = await agent.stream(
+    { messages: "What were the titles?" },
+    {
+        streamMode: "values",
+        context: { db }
+    }
+)
+
+counter = 1;
+for await (const step of stream) {
+    console.log(`${counter++} Total messages in the step: ${step.messages.length}`)
+    displayMessage(step.messages.at(-1));
+}
